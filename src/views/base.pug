@@ -8,16 +8,19 @@ html(lang="ko")
             h1=pageTitle
             nav 
                 ul                
-                    li 
-                        a(href="videos/upload") Upload video 
                     li
                         a(href="/") Home  
 
                     if loggedIn
-                        li
-                            a(href="user/logout") Log Out 
+                        li        
+                            a(href="/videos/upload") Upload video
                         li 
-                            a(href="/my-profile") #{loggedInUser.name}'s profile    
+                            a(href=`/users/${loggedInUser._id}`) My profile
+
+                        li
+                            a(href="/users/edit") Edit Profile 
+                        li 
+                            a(href="/users/logout") Log Out                                                           
                     else
                         li
                             a(href="/join") Join

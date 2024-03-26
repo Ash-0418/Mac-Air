@@ -1,12 +1,14 @@
 extends base.pug
 
-
-
-block content 
-    h3 #{video.views} #{video.views in [0,1] ? "view" : "views"}
-        div 
+block content
+        video(src="/" + video.fileUrl, controls)
+        div
             p=video.description
             small=video.createdAt
-        a(href=`${video.id}/edit`) Edit Video &rarr;
-        br
-        a(href=`${video.id}/delete`) Delete Video &rarr;
+        div     
+            small Uploaded by
+                a(href=`/users/${video.owner._id}`)=vidoe.owner.name
+        if String(vidoe.owner._id) === String(loggedInUser._id)     
+            a(href=`${video.id}/edit`) Edit Video &rarr;
+            br
+            a(href=`${video.id}/delete`) Delete Video &rarr;

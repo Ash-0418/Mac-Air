@@ -44,6 +44,7 @@ app.get("/add-one",(req, res, next)=>{
 
 
 app.use(localsMiddelware);
+app.use("/uploads", express.static("uploads"));
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
