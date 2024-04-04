@@ -9,7 +9,7 @@ export const home = async(req, res) => {
 export const watch= async(req, res) =>{
     const {id} = req.params;
     const video = await Video.findById(id).populate("owner");
-    
+    console.log(video);
     if(!video){
         return res.render("404", {pageTitle:"Video not found"})
     }return res.render("watch",{pageTitle: video.title, video});
