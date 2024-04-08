@@ -1,3 +1,5 @@
 node_modules
 .evn
 /upload
+DB_stroe
+/assets
