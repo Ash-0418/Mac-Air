@@ -4,12 +4,12 @@ html(lang="ko")
         title #{pageTitle} | #{siteName} 
         link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css")
         link(rel="stylesheet", href="/static/css/styles.css")
+        script(src="https://kit.fontawesome.com/9095a5efbb.js" crossorigin="anonymous")
         include partials/header.pug
     body 
 
         main 
             block content 
+    block script 
     include partials/footer.pug
-    script(src="/static/js/main.js")
-    script(src="https://kit.fontawesome.com/9095a5efbb.js" crossorigin="anonymous")
     
