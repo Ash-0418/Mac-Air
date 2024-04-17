@@ -1,8 +1,6 @@
 //makeing Video model with mongoose
 import mongoose from "mongoose";
 
-
-
 const videoSchema = new mongoose.Schema({
     title:{type: String,required:true, maxlength: 80},
     fileUrl:{type: String, required: true},

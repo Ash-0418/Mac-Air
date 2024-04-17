@@ -19,7 +19,10 @@ let setVideoPlayStatus = false;
 let controlsTimeout = null;
 let controlsMovementTimeout = null;
 
-const handlePlayClick = (e) => {
+console.log(videoContainer.dataset);
+
+
+const handlePlayClick = () => {
     //if the video is playing, puse it
     //else playing the video
     if(video.paused){
@@ -27,7 +30,6 @@ const handlePlayClick = (e) => {
     }else{
         video.pause();
     }
-    //playBtn.innerText = video.paused ? "Play" : "Pause"
     playBtnIcon.classList = video.paused ? "fas fa-play" : "fas fa-pause" ;
 
 };
@@ -123,6 +125,13 @@ const handleVideoClickPlay = () => {
     handlePlayClick();
     };
 
+const handleEnded = () => {
+        const { id } = videoContainer.dataset;
+        fetch(`/api/videos/${id}/view`, {
+          method: "POST",
+        });
+    };
+
 playBtn.addEventListener("click", handlePlayClick);
 muteBtn.addEventListener("click", handlemute);
 volumeRange.addEventListener("input", handleVolumeChange);
@@ -134,6 +143,7 @@ videoContainer.addEventListener("mouseleave", handleMouseLeave);
 timeline.addEventListener("change", handleTimelineSet);
 fullScreenBtn.addEventListener("click", handleFullscreen);
 video.addEventListener("click", handleVideoClickPlay);
+video.addEventListener("ended", handleEnded);
 
 document.addEventListener("keyup", (event) => {
     if (event.code === "Space") {

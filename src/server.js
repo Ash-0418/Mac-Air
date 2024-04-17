@@ -6,6 +6,7 @@ import rootRouter from "../src/router/rootRouter.js";
 import userRouter from "../src/router/userRouter.js";
 import videoRouter from "../src/router/videoRouter.js";
 import { localsMiddelware } from "./middlewares.js";
+import apiRouter from "./router/apiRouter.js";
 
 
 
@@ -49,6 +50,7 @@ app.use("/static", express.static("assets"));
 app.use("/", rootRouter);
 app.use("/videos", videoRouter);
 app.use("/users", userRouter);
+app.use("/api", apiRouter);
 
 
 
