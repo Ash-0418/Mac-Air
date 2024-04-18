@@ -123,31 +123,31 @@ const handleMouseLeave = () =>{
 };
 const handleVideoClickPlay = () => {
     handlePlayClick();
-    };
+};
 
 const handleEnded = () => {
-        const { id } = videoContainer.dataset;
-        fetch(`/api/videos/${id}/view`, {
-          method: "POST",
-        });
-    };
-
-playBtn.addEventListener("click", handlePlayClick);
-muteBtn.addEventListener("click", handlemute);
-volumeRange.addEventListener("input", handleVolumeChange);
-video.addEventListener("loadedmetadata", loadeddata);
-video.addEventListener("timeupdate", handleTimeUpdate);
-timeline.addEventListener("input", handleTimelineChange);
-videoContainer.addEventListener("mousemove", handleMouseMove);
-videoContainer.addEventListener("mouseleave", handleMouseLeave);
-timeline.addEventListener("change", handleTimelineSet);
-fullScreenBtn.addEventListener("click", handleFullscreen);
-video.addEventListener("click", handleVideoClickPlay);
-video.addEventListener("ended", handleEnded);
-
-document.addEventListener("keyup", (event) => {
-    if (event.code === "Space") {
-        handlePlayClick();
-        event.preventDefault();
-            }
+    const id= videoContainer.dataset.id;
+    fetch(`/api/videos/${id}/view`, {
+        method: "POST",
     });
+};
+    
+    playBtn.addEventListener("click", handlePlayClick);
+    muteBtn.addEventListener("click", handlemute);
+    volumeRange.addEventListener("input", handleVolumeChange);
+    video.addEventListener("loadedmetadata", loadeddata);
+    video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("click", handleVideoClickPlay);
+    video.addEventListener("ended", handleEnded);
+    timeline.addEventListener("input", handleTimelineChange);
+    videoContainer.addEventListener("mousemove", handleMouseMove);
+    videoContainer.addEventListener("mouseleave", handleMouseLeave);
+    timeline.addEventListener("change", handleTimelineSet);
+    fullScreenBtn.addEventListener("click", handleFullscreen);
+    
+    document.addEventListener("keyup", (event) => {
+            if (event.code === "Space") {
+                handlePlayClick();
+                event.preventDefault();
+                    }
+            });
