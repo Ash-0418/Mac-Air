@@ -1,41 +1,76 @@
+import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 const startBtn = document.getElementById("startBtn");
 const preview = document.getElementById("preview");
 
 let stream;
-let recoder;
+let recorder;
 let videoFile;
 
-const handleDownloaded = (event) =>{
+const handleDownloaded = async () =>{
+
+    const ffmpeg = createFFmpeg({log: true});
+    await ffmpeg.load();
+    ffmpeg.FS("writeFile", "recording.webm", await fetchFile(videoFile));
+    await ffmpeg.run("-i", "recording.webm","-r", "60", "output.mp4");
+    await ffmpeg.run("-i", "recording.webm","-ss", "00:00:01", "-frames:v", "1", "tnahumbil.jpg");
+    
+
+    const mp4File = ffmpeg.FS("readFile", "output.mp4");
+    const thumbFile = ffmpeg.FS("readFile", "thumbnail.jpg")
+    //console.log(mp4File);
+    //console.log(mp4File.buffer);
+    const mp4Blob = new Blob([mp4File.buffer], {type:"video/mp4"});
+    const thumbBlob = new Blob([thumbFile.buffer], {type:"image/jpg"});
+    const mp4URL = URL.createObjectURL(mp4Blob);
+    const thumbURL = URL.createObjectURL(thumbBlob);
+
     const a = document.createElement("a");
-    a.href = videoFile;
-    a.download = "MyRecordgin.webm";
+    a.href = mp4URL;
+    a.download = "MyRecordgin.mp4";
     document.body.appendChild(a);
     a.click();
+    a.remove();
+
+
+    const thumbA = document.createElement("a");
+    thumbA.href = thumbURL;
+    thumbA.download = "MyThumbnail.jpg";
+    document.body.appendChild(thumbA);
+    thumbA.click();
+    thumbA.remove();
+
+
+
+    URL.revokeObjectURL(videoFile);
+    URL.revokeObjectURL(mp4File);
+    URL.revokeObjectURL(thumbFile);
+    
+
 };
 
 const handleStop = () =>{
     startBtn.innerText = "Download recoding"
     startBtn.removeEventListener("click", handleStop);
     startBtn.addEventListener("click", handleDownloaded);
-    recoder.stop();
+    recorder.stop();
 };
 
 const handleStart = () =>{
     startBtn.innerText = "Stop recoding"
     startBtn.removeEventListener("click", handleStart);
     startBtn.addEventListener("click", handleStop);
-    recoder = new MediaRecorder(stream);
-    recoder.ondataavailable = (event) => {
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (event) => {
         videoFile =URL.createObjectURL(event.data);
-        video.srcObject = null;
-        video.src = videoFile;
-        video.loop();
-        video.play();
+        preview.srcObject = null;
+        preview.src = videoFile;
+        preview.loop = true;
+        preview.play();
     };
-    recoder.start();
-    setTimeout(() =>{
-        recoder.stop();
-    },10000);
+    recorder.start();
+    //setTimeout(() =>{
+    //    recorder.stop();
+    //},10000);
     
 };
 
