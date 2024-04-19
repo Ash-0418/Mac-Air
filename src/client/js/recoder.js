@@ -1,64 +1,101 @@
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
-const startBtn = document.getElementById("startBtn");
+const actionBtn = document.getElementById("actionBtn");
 const preview = document.getElementById("preview");
 
 let stream;
 let recorder;
 let videoFile;
 
+const file = {
+    input: "recording.webm",
+    output: "output.mp4",
+    thumbnail: "thumbnail.jpg"
+};
+
+const init = async() =>{
+    stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: {width: 200, height:200},
+    });
+    preview.srcObject = stream;
+    preview.play();
+};
+
 const handleDownloaded = async () =>{
+    actionBtn.removeEventListener("click", handleDownloaded);
+    actionBtn.innerText = "Tranforming ...";
+    actionBtn.disabled = true;
 
     const ffmpeg = createFFmpeg({log: true});
     await ffmpeg.load();
-    ffmpeg.FS("writeFile", "recording.webm", await fetchFile(videoFile));
-    await ffmpeg.run("-i", "recording.webm","-r", "60", "output.mp4");
-    await ffmpeg.run("-i", "recording.webm","-ss", "00:00:01", "-frames:v", "1", "tnahumbil.jpg");
-    
+    ffmpeg.FS("writeFile", file.input, await fetchFile(videoFile));
 
-    const mp4File = ffmpeg.FS("readFile", "output.mp4");
-    const thumbFile = ffmpeg.FS("readFile", "thumbnail.jpg")
-    //console.log(mp4File);
+    try {
+        await ffmpeg.run("-i", file.input, "-r", "60", file.output);
+        await ffmpeg.run("-i", file.input, "-ss", "00:00:01", "-frames:v", "1", file.thumbnail);
+    } catch (e) {
+        console.error('Error processing video with FFmpeg:', e);
+    };
+    
+    const download = (fileURL, fileName) =>{
+        const a = document.createElement("a");
+        a.href = fileURL;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+    };
+
+    const files = ffmpeg.FS('readdir', '/');
+    if (files.includes(file.output)) {
+        const mp4File = ffmpeg.FS('readFile', file.output);
+    } else {
+    console.error('File not found:', file.output);
+    }
+
+
+    const mp4File = ffmpeg.FS("readFile",file.output);
+    const thumbFile = ffmpeg.FS("readFile", file.thumbnail)
+    //console.log(thumbFile);
     //console.log(mp4File.buffer);
     const mp4Blob = new Blob([mp4File.buffer], {type:"video/mp4"});
-    const thumbBlob = new Blob([thumbFile.buffer], {type:"image/jpg"});
     const mp4URL = URL.createObjectURL(mp4Blob);
+    const thumbBlob = new Blob([thumbFile.buffer], {type:"image/jpg"});
     const thumbURL = URL.createObjectURL(thumbBlob);
 
-    const a = document.createElement("a");
-    a.href = mp4URL;
-    a.download = "MyRecordgin.mp4";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-
-    const thumbA = document.createElement("a");
-    thumbA.href = thumbURL;
-    thumbA.download = "MyThumbnail.jpg";
-    document.body.appendChild(thumbA);
-    thumbA.click();
-    thumbA.remove();
+    download(mp4URL, "My recording.mp4");
+    download(thumbURL, "MyThumbnail.jpg");
 
 
 
+
+    ffmpeg.FS("unlink", file.input);
+    ffmpeg.FS("unlink", file.output);
+    ffmpeg.FS("unlink", file.thumbnail);
+  
+    URL.revokeObjectURL(mp4URL);
+    URL.revokeObjectURL(thumbURL);
     URL.revokeObjectURL(videoFile);
-    URL.revokeObjectURL(mp4File);
-    URL.revokeObjectURL(thumbFile);
-    
 
 };
 
 const handleStop = () =>{
-    startBtn.innerText = "Download recoding"
-    startBtn.removeEventListener("click", handleStop);
-    startBtn.addEventListener("click", handleDownloaded);
-    recorder.stop();
+    actionBtn.innerText = "Download Recording";
+    actionBtn.removeEventListener("click", handleStop);
+    actionBtn.addEventListener("click", handleDownloaded);
 };
 
-const handleStart = () =>{
-    startBtn.innerText = "Stop recoding"
-    startBtn.removeEventListener("click", handleStart);
-    startBtn.addEventListener("click", handleStop);
+const handleStart = async() =>{
+    actionBtn.innerText = "Stop recoding"
+    actionBtn.removeEventListener("click", handleStart);
+    actionBtn.addEventListener("click", handleStop);
+
+    await init();  // 스트림 초기화를 기다립니다.
+
+    if (!stream || !(stream instanceof MediaStream)) {
+    console.error("Provided stream is not valid.");
+    return;
+}
+
     recorder = new MediaRecorder(stream);
     recorder.ondataavailable = (event) => {
         videoFile =URL.createObjectURL(event.data);
@@ -75,14 +112,5 @@ const handleStart = () =>{
 };
 
 
-const init = async() =>{
-    stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {width: 200, height:200},
-    });
-    preview.srcObject = stream;
-    preview.play();
-};
-init();
 
-startBtn.addEventListener("click", handleStart);
+actionBtn.addEventListener("click", handleStart);
