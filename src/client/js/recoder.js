@@ -28,6 +28,7 @@ const handleDownloaded = async () =>{
 
     const ffmpeg = createFFmpeg({log: true});
     await ffmpeg.load();
+    
     ffmpeg.FS("writeFile", file.input, await fetchFile(videoFile));
 
     try {
